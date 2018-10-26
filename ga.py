@@ -5,51 +5,6 @@ from matplotlib import cm, colors, patheffects
 from matplotlib.gridspec import GridSpec
 
 
-# def xkcd2(scale=0, length=500, randomness=50):
-#     """
-#     Turns on `xkcd <https://xkcd.com/>`_ sketch-style drawing mode.
-#     This will only have effect on things drawn after this function is
-#     called.
-#
-#     For best results, the "Humor Sans" font should be installed: it is
-#     not included with matplotlib.
-#
-#     Parameters
-#     ----------
-#     scale : float, optional
-#         The amplitude of the wiggle perpendicular to the source line.
-#     length : float, optional
-#         The length of the wiggle along the line.
-#     randomness : float, optional
-#         The scale factor by which the length is shrunken or expanded.
-#     """
-#     from matplotlib import rc_context, rcParams
-#     if rcParams['text.usetex']:
-#         raise RuntimeError(
-#             "xkcd mode is not compatible with text.usetex = True")
-#
-#     from matplotlib import patheffects
-#     xkcd_ctx = rc_context({
-#         'font.family': ['Humor Sans', 'Comic Sans MS'],
-#         'path.sketch': (scale, length, randomness),
-#     })
-#     xkcd_ctx.__enter__()
-#
-#     # In order to make the call to `xkcd` that does not use a context manager
-#     # (cm) work, we need to enter into the cm ourselves, and return a dummy
-#     # cm that does nothing on entry and cleans up the xkcd context on exit.
-#     # Additionally, we need to keep a reference to the dummy cm because it
-#     # would otherwise be exited when GC'd.
-#
-#     class dummy_ctx(object):
-#         def __enter__(self):
-#             pass
-#
-#         __exit__ = xkcd_ctx.__exit__
-#
-#     return dummy_ctx()
-
-
 class GA:
     def __init__(self, fitfun, dnaLength=None, mutationRate=0.01, populationSize=100,
                  userdata=None, elitecount=1, plotting='slow', ltc='stall',
