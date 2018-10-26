@@ -33,6 +33,7 @@ class GA:
         self.stochastic=stochastic
         self.SAtemp = 0.5
         self.limMode = limMode
+        self.nAx=0
         # self.accProb = 1
         if self.customPlot is None:
             self.customPlot = []
@@ -119,14 +120,9 @@ class GA:
 
     def plotfun(self, ifprog=False):
         def sigmoid(x, scale, yoffset):
-            # y = []
             t = (1 / (1 + np.exp(-x)))
             t = (t - (1 / (1 + math.exp(-x[0])))) * (1 + (2 * math.exp(-x[-1])))
             y = scale * t + yoffset
-            # for i in x:
-            #     t = (1 / (1 + math.exp(-i)))
-            #     t = (t - (1 / (1 + math.exp(-x[0])))) * (1 + (2 * math.exp(-x[-1])))
-            #     y.append(scale * t + yoffset)
             return y
 
         norms = colors.Normalize(vmin=0, vmax=max(self.plotprocdata[1]))
@@ -135,7 +131,7 @@ class GA:
             # plt.ion()
             self.plothandles[0] = plt.figure(1)
             gs = GridSpec(len(self.customPlot) + 1, 4)
-            ax = self.plothandles[0].add_subplot(gs[0, :-1])
+            ax = self.plothandles[0].add_subplot(gs[0, :-1]) # gs[0, :-1]
             # ax = plt.subplot(len(self.customPlot)+1, 2, 1)
             # self.plothandles[2] = plt.text(x=self.generation / 2, y=self.besthistory[-1] / 5, alpha=0.25,
             #                                s=[len(self.population[0].genes), round(self.besthistory[-1], 4)],
@@ -146,7 +142,7 @@ class GA:
                 # self.plothandles[1] = plt.scatter(self.plotprocdata[0], self.plotprocdata[1], alpha=1, marker='s', s=25,
                 #                                   c=cm.jet(norms(self.plotprocdata[1]), bytes=True) / 255)
 
-                self.plothandles[5] = plt.plot(self.plotprocdata[0], np.transpose(self.plotprocdata[5]), alpha=0.5, c='white', lw=0.5)
+                self.plothandles[5] = plt.plot(self.plotprocdata[0], np.transpose(self.plotprocdata[5]), alpha=0.5, c='aqua', lw=0.5)
                 self.plothandles[4] = plt.plot(self.plotprocdata[0], self.plotprocdata[6], alpha=1, c='white', lw=0.7)
                 self.plothandles[1] = plt.plot(self.plotprocdata[0], self.plotprocdata[1],c='red')
             elif self.speed is 'slow':
@@ -158,12 +154,14 @@ class GA:
 
             ax2 = self.plothandles[0].add_subplot(gs[0, 3])
             self.plotGraphGenes(ax2)
-            ax3 = self.plothandles[0].add_subplot(gs[1, 3])
-            self.plotBarGenes(ax3)
+            # ax3 = self.plothandles[0].add_subplot(gs[1, 3])
+            # self.plotBarGenes(ax3)
+            # self.plotGraphGenes(ax3)
 
             if len(self.customPlot) is not 0:
+                self.nAx = len(self.plothandles[0].axes)
                 for i in range(len(self.customPlot)):
-                    ax = self.plothandles[0].add_subplot(gs[i+1, :-1])
+                    ax = self.plothandles[0].add_subplot(gs[i+1, :]) # gs[i+1, :]
                     self.plothandles.append(ax)
                     cp = self.customPlot[i]
                     cp(self, self.plothandles[-1])
@@ -227,15 +225,15 @@ class GA:
                                                      [min(self.plotprocdata[6]), self.besthistory[-2]], c='lime', lw=2)
 
             self.plotGraphGenes(self.plothandles[0].axes[1])
-            self.plotBarGenes(self.plothandles[0].axes[2])
+            # self.plotBarGenes(self.plothandles[0].axes[2])
 
-            if ifprog is True:
-                self.plothandles[0].axes[0].plot([self.generation - 0.5, self.generation - 0.5], [self.besthistory[0], self.besthistory[-2]], c='green', lw=2)
+            # if ifprog is True:
+            #     self.plothandles[0].axes[0].plot([self.generation - 0.5, self.generation - 0.5], [self.besthistory[0], self.besthistory[-2]], c='green', lw=2)
 
             if len(self.customPlot) is not 0:
                 for i in range(len(self.customPlot)):
                     cp = self.customPlot[i]
-                    cp(self, self.plothandles[0].axes[i+3])
+                    cp(self, self.plothandles[0].axes[i+self.nAx])
 
         # t1 = time.time()
         # self.plothandles[0].canvas.draw()
@@ -332,14 +330,14 @@ class GA:
             return False
         if self.ltc is 'stall':
             k = abs(self.besthistory[-1] - self.besthistory[max(0, self.generation-15)])
-            if k < 0.00001 and self.generation > 15:
+            if k < 0.00001 and self.generation > 5:
                 return True
             else:
                 return False
         elif self.ltc is 'quant':
             a = [o.fitness for o in self.population]
             k = np.percentile(a, 5)
-            if k >= 0.995*self.besthistory[-1] and self.generation > 15:
+            if k >= 0.99*self.besthistory[-1] and self.generationInEpoch > 10:
                 return True
             else:
                 return False
@@ -349,7 +347,7 @@ class GA:
             thr = 0.99 * self.besthistory[-1]
             # print(k, thr)
             if k >= thr:
-                kk = abs(self.besthistory[-1] - self.besthistory[max(0, self.generation - 15)])
+                kk = abs(self.besthistory[-1] - self.besthistory[max(0, self.generation - 20)])
                 # print(kk)
                 if kk < 0.001*self.besthistory[-1] and self.generationInEpoch > 20:
                     return True
@@ -431,8 +429,8 @@ class GA:
         # Mate selected partners into the offspring, mutate obtained child
         # and insert into new generation by overwriting previous population
 
-        # ratio = self.learningRate  # constant
-        self.learningRate = 0.8 + 0.7*np.exp(-0.0035*self.generation)  # simulated annealing
+        ratio = self.learningRate  # constant
+        # self.learningRate = 0.8 + 0.6*np.exp(-0.0035*self.generation)  # simulated annealing
 
         for i in range(self.popsize-self.elitecount):
             partner1 = random.choice(self.matingPool)

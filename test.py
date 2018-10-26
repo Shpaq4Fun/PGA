@@ -125,8 +125,11 @@ def customPlot1(self, ax):
         ax.set_xlim(0, 0.5 * self.userdata[1] * w[-1] / np.pi)
     else:
         self.plothandles[3][0].set_ydata(20 * np.log10(abs(h)))
-        self.plothandles[0].axes[3].set_ylim(np.nanmin(20 * np.log10(abs(h)))*1.05, 0)
-        self.plothandles[0].axes[3].set_title('Designed filter of length ' + str(len(self.population[0].genes)*2-1))
+        # self.plothandles[0].axes[self.nAx].set_ylim(np.nanmin(20 * np.log10(abs(h)))*1.05, 0)
+        # self.plothandles[0].axes[self.nAx].set_title('Designed filter of length ' + str(len(self.population[0].genes)*2-1))
+        ax.set_ylim(np.nanmin(20 * np.log10(abs(h))) * 1.05, 0)
+        ax.set_title('Designed filter of length ' + str(len(self.population[0].genes) * 2 - 1))
+
 
 def customPlot2(self, ax):
     # ax.clear()
@@ -203,7 +206,7 @@ def customPlot2(self, ax):
         self.plothandles[7] = ax.plot([t[(targ[0]-targ[7])]]*2, [np.nanmin([np.nanmin(targ[3]), np.nanmin(x)]), np.nanmax([np.nanmax(targ[3]), np.nanmax(x)])], c='white', lw=1, alpha=1)
         ax.set_title(round(1/self.population[-1].fitness, 2), color='white') #, round(p5over, 1), round(p25over, 1), round(p5over1, 1), round(p25over1, 1)], color='white')
         self.plothandles[8] = [0,0,0,0]
-        aa=(str(overs[k - 1, 0]) + '\n' + str(overs[k - 1, 1]))
+        # aa=(str(overs[k - 1, 0]) + '\n' + str(overs[k - 1, 1]))
         for k in range(1, len(breaks)):
             xx=f(targ[10][int(breaks[k-1]+(breaks[k]-breaks[k-1])/2)])
             self.plothandles[8][k-1] = plt.text((xx),0,(str(round(overs[k-1,0],2))+'\n'+str(round(overs[k - 1, 1],2))),
@@ -217,8 +220,8 @@ def customPlot2(self, ax):
         self.plothandles[5][1].set_ydata(np.transpose(np.percentile(x, 95, 0)))
         self.plothandles[6][0].set_ydata(np.transpose(estimate))
         self.plothandles[7][0].set_ydata(np.transpose([np.nanmin([np.nanmin(targ[3]), np.nanmin(x)]), np.nanmax([np.nanmax(targ[3]), np.nanmax(x)])]))
-        self.plothandles[0].axes[3].set_title(round(1/self.population[-1].fitness, 2)) #, round(p5over, 1), round(p25over, 1), round(p5over1, 1), round(p25over1, 1)])
-        self.plothandles[0].axes[3].set_ylim(np.nanmin([np.nanmin(targ[3]), np.nanmin(x)]), np.nanmax([np.nanmax(targ[3]), np.nanmax(x)]))
+        ax.set_title(round(1/self.population[-1].fitness, 2)) #, round(p5over, 1), round(p25over, 1), round(p5over1, 1), round(p25over1, 1)])
+        ax.set_ylim(np.nanmin([np.nanmin(targ[3]), np.nanmin(x)]), np.nanmax([np.nanmax(targ[3]), np.nanmax(x)]))
         ll=ax.get_ylim()
         for k in range(1, len(breaks)):
             yy=ll[0]+0.8*(ll[1]-ll[0])
@@ -276,26 +279,24 @@ def data1():  # lozysko_b
     feed = np.array(feed)
     feed = np.transpose(feed).squeeze()
     fs = 19200
-    window = 256
-    overlap = 180
     nfft = 256
     dl = 4
     lcon = [-1] * dl
     ucon = [1] * dl
-    mr = 0.005
-    psize = 50
-    ec = 5
-    lr = 1.4
+    mr = 0.004
+    psize = 100
+    ec = 4
+    lr = 1.1
 
-    epochs = 8
+    epochs = 15
     cp = [customPlot1]
     pi = 1
     feed = [feed,fs]
     fitfun = fitfun1
     st = False
     limmode = 'random'
-    ltc = 'qs'
-    return feed, fs, window, overlap, nfft, np.array(lcon), np.array(ucon), mr, psize, ec, lr, dl, epochs, cp, pi, \
+    ltc = 'quant'
+    return feed, fs, nfft, np.array(lcon), np.array(ucon), mr, psize, ec, lr, dl, epochs, cp, pi, \
            fitfun, st, limmode, ltc
 
 def data2():
@@ -377,7 +378,7 @@ def data3():  # regresja
     ltc = 'inf'
     return feed, np.array(lcon), np.array(ucon), mr, psize, ec, lr, dl, epochs, cp, pi, fitfun, st, limmode, ltc
 
-feed, fs, nperseg, noverlap, nfft, lcon, ucon, mr, psize, ec, lr, dl, epochs, cp, pi, fitfun, st, limmode, ltc = data1()
+feed, fs, nfft, lcon, ucon, mr, psize, ec, lr, dl, epochs, cp, pi, fitfun, st, limmode, ltc = data1()
 # feed, lcon, ucon, mr, psize, ec, lr, dl, epochs, cp, pi, fitfun, st, limmode, ltc = data2()
 # feed, lcon, ucon, mr, psize, ec, lr, dl, epochs, cp, pi, fitfun, st, limmode, ltc = data3()
 
